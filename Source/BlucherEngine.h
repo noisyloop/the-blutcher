@@ -79,7 +79,7 @@ public:
             if (!locks.pitch) { constexpr int pitches[] = {-12,-7,-5,0,0,0,5,7,12}; s.semitones = unit()<chaos ? pitches[random()%9] : 0; }
             if (!locks.effects) {
                 s.reverse = unit() < chaos*.35f;
-                s.repeats = unit()<chaos*.6f ? (1 << (1 + random()%3)) : 1;
+                if (!locks.rhythm) s.repeats = unit()<chaos*.6f ? (1 << (1 + random()%3)) : 1;
                 s.gain = .55f + unit()*.4f;
             }
         }
