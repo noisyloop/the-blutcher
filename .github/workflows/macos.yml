@@ -24,7 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Restore incremental CMake build cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
+        id: build-cache
         with:
           path: build
           key: blucher-macos15-xcode-v1-${{ hashFiles('CMakeLists.txt') }}-${{ github.sha }}
