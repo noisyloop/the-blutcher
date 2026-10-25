@@ -59,6 +59,17 @@ void BlucherProcessor::generate(bool mutate) { const juce::ScopedLock l(mutex); 
 void BlucherProcessor::undo() { const juce::ScopedLock l(mutex); if(!history.empty()){ engine.pattern=history.back(); history.pop_back(); } }
 void BlucherProcessor::swapAB() { const juce::ScopedLock l(mutex); checkpoint(); std::swap(engine.pattern,alternate); }
 void BlucherProcessor::toggleStep(int i,bool lock) { const juce::ScopedLock l(mutex); if(i<0||i>=16)return; checkpoint(); auto& s=engine.pattern.notes[size_t(i)]; if(lock)s.locked=!s.locked; else s.enabled=!s.enabled; }
+void BlucherProcessor::editStep(int i,int action) {
+    const juce::ScopedLock l(mutex); if(i<0||i>=16||action==0)return;checkpoint();auto& s=engine.pattern.notes[size_t(i)];
+    if(action>=100&&action<108){s.slot=action-100;s.slice=0;}
+    if(action==1)s.reverse=!s.reverse;
+    if(action==2)s.slice=std::max(0,s.slice-1);
+    if(action==3){const auto& sample=engine.samples[size_t(s.slot)];s.slice=std::min(s.slice+1,std::max(0,int(sample.cuts.size())-2));}
+    if(action==4)s.semitones=std::max(-24,s.semitones-1);
+    if(action==5)s.semitones=std::min(24,s.semitones+1);
+    if(action==6)s.semitones=0;
+    if(action>=11&&action<=18)s.repeats=action-10;
+}
 blucher::Pattern BlucherProcessor::getPattern() const { const juce::ScopedLock l(mutex); return engine.pattern; }
 juce::String BlucherProcessor::slotName(int i) const { const juce::ScopedLock l(mutex); const auto& s=engine.samples[size_t(i)]; return names[size_t(i)].isEmpty() ? "Drop sample / click to load" : names[size_t(i)]+"  /  "+juce::String(int(s.cuts.size())-1)+" slices"; }
 void BlucherProcessor::reslice() { const juce::ScopedLock l(mutex); for(auto& s:engine.samples) if(s.loaded())s.slice(parameters.getRawParameterValue("sensitivity")->load()); }

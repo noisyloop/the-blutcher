@@ -3,7 +3,16 @@ namespace { const juce::Colour background(0xff10131a), panel(0xff1c2230), accent
 BlucherEditor::BlucherEditor(BlucherProcessor& p) : AudioProcessorEditor(p),processor(p) {
     setSize(1000,740);
     for(int i=0;i<8;++i){auto& b=sampleButtons[size_t(i)];addAndMakeVisible(b);b.onClick=[this,i]{chooseSample(i);};b.setColour(juce::TextButton::buttonColourId,panel);b.setColour(juce::TextButton::textColourOffId,text);}
-    for(int i=0;i<16;++i){auto& b=stepButtons[size_t(i)];addAndMakeVisible(b);b.onClick=[this,i]{processor.toggleStep(i,juce::ModifierKeys::getCurrentModifiers().isShiftDown());timerCallback();};}
+    for(int i=0;i<16;++i){auto& b=stepButtons[size_t(i)];addAndMakeVisible(b);b.onClick=[this,i]{
+        if(juce::ModifierKeys::getCurrentModifiers().isAltDown()){
+            juce::PopupMenu menu;auto step=processor.getPattern().notes[size_t(i)];
+            menu.addItem(1,"Reverse",true,step.reverse);menu.addItem(2,"Previous slice");menu.addItem(3,"Next slice");
+            menu.addItem(4,"Pitch -1 semitone");menu.addItem(5,"Pitch +1 semitone");menu.addItem(6,"Reset pitch");
+            juce::PopupMenu sources,repeats;for(int slot=0;slot<8;++slot)sources.addItem(100+slot,"Slot "+juce::String(slot+1),true,step.slot==slot);
+            for(int n=1;n<=8;++n)repeats.addItem(10+n,juce::String(n),true,step.repeats==n);
+            menu.addSubMenu("Source",sources);menu.addSubMenu("Retriggers",repeats);
+            juce::Component::SafePointer<BlucherEditor> safe(this);menu.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(&stepButtons[size_t(i)]),[safe,i](int action){if(safe){safe->processor.editStep(i,action);safe->timerCallback();}});
+        }else processor.toggleStep(i,juce::ModifierKeys::getCurrentModifiers().isShiftDown());timerCallback();};}
     const char* lockNames[]={"Lock rhythm","Lock sources","Lock pitch","Lock glitches"};
     for(int i=0;i<4;++i){auto& b=lockButtons[size_t(i)];addAndMakeVisible(b);b.setButtonText(lockNames[i]);b.onClick=[this,i]{const juce::ScopedLock l(processor.mutex);bool value=lockButtons[size_t(i)].getToggleState();if(i==0)processor.locks.rhythm=value;if(i==1)processor.locks.source=value;if(i==2)processor.locks.pitch=value;if(i==3)processor.locks.effects=value;};}
     const char* ids[]={"chaos","sensitivity","gain","bpm"};const char* titles[]={"CHAOS","SLICE SENSITIVITY","OUTPUT","PREVIEW BPM"};
@@ -14,6 +23,7 @@ BlucherEditor::BlucherEditor(BlucherProcessor& p) : AudioProcessorEditor(p),proc
     mutate.onClick=[this]{processor.generate(true);timerCallback();};undo.onClick=[this]{processor.undo();timerCallback();};ab.onClick=[this]{processor.swapAB();timerCallback();};
     play.onClick=[this]{processor.preview.store(!processor.preview.load());};
     slice.onClick=[this]{processor.reslice();status.setText("Slices updated using the current sensitivity.",juce::dontSendNotification);timerCallback();};
+    drag.setTriggeredOnMouseDown(true);
     save.onClick=[this]{exportAudio(false);};drag.onClick=[this]{exportAudio(true);};
     division.addItemList({"1/2","1/4","1/8","1/16","1/32","1/8 triplet","1/16 triplet","1/16 dotted"},1);addAndMakeVisible(division);
     divisionAttachment=std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(processor.parameters,"division",division);
@@ -26,7 +36,7 @@ void BlucherEditor::paint(juce::Graphics& g){
     g.setColour(text.withAlpha(.6f));g.setFont(14.f);g.drawText("NOISYLOOP  /  MULTI-SAMPLE GLITCH INSTRUMENT",26,72,800,24,juce::Justification::centredLeft);
     g.setColour(panel);g.fillRoundedRectangle(20,110,960,230,12);g.fillRoundedRectangle(20,355,960,155,12);
     g.setColour(text);g.setFont(13.f);g.drawText("SAMPLE BANK  ·  UP TO 30 SECONDS EACH  ·  DROP FILES ON A SLOT",36,119,900,24,juce::Justification::centredLeft);
-    g.drawText("PHRASE  ·  CLICK TO MUTE  ·  SHIFT-CLICK TO LOCK A STEP",36,363,900,24,juce::Justification::centredLeft);
+    g.drawText("PHRASE  ·  CLICK TO MUTE  ·  SHIFT-CLICK TO LOCK  ·  ALT-CLICK TO EDIT",36,363,900,24,juce::Justification::centredLeft);
     auto pattern=processor.getPattern();g.setColour(text.withAlpha(.6f));g.drawText("SEED "+juce::String(juce::int64(pattern.seed))+"  /  SAVED WITH YOUR SESSION",26,704,850,22,juce::Justification::centredLeft);
 }
 void BlucherEditor::resized(){

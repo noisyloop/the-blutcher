@@ -1,5 +1,16 @@
 #pragma once
 #include "PluginProcessor.h"
+class BlucherStepButton : public juce::TextButton {
+public:
+    void paintButton(juce::Graphics& g,bool over,bool down) override {
+        auto colour=findColour(juce::TextButton::buttonColourId);
+        g.setColour(colour.brighter(down?.2f:(over?.1f:0.f)));
+        g.fillRoundedRectangle(getLocalBounds().toFloat(),5.f);
+        g.setColour(findColour(juce::TextButton::textColourOffId));
+        g.setFont(12.f);
+        g.drawFittedText(getButtonText(),getLocalBounds().reduced(3),juce::Justification::centred,3);
+    }
+};
 class BlucherEditor : public juce::AudioProcessorEditor, public juce::FileDragAndDropTarget, private juce::Timer {
 public:
     explicit BlucherEditor(BlucherProcessor&);
@@ -15,7 +26,7 @@ private:
     void exportAudio(bool drag);
     BlucherProcessor& processor;
     std::array<juce::TextButton,8> sampleButtons;
-    std::array<juce::TextButton,16> stepButtons;
+    std::array<BlucherStepButton,16> stepButtons;
     std::array<juce::ToggleButton,4> lockButtons;
     std::array<juce::Slider,4> sliders;
     std::array<juce::Label,4> labels;

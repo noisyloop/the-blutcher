@@ -10,7 +10,7 @@ Download **The-Blucher-macOS** from a successful [Actions build](../../actions),
 2. Click a sample slot or drop audio onto it. Dropping multiple files fills successive slots. Each slot accepts up to 30 seconds at 8–192 kHz; WAV, AIFF, and FLAC are recommended.
 3. Adjust **Slice sensitivity**, then press **Re-slice** to detect new transients. Sustained audio falls back to evenly spaced slices.
 4. Press **Generate**, then **Preview**, or start Live's transport. While the host plays, the phrase follows host tempo and song position. Preview uses its own BPM when stopped.
-5. Click a step to mute it; Shift-click to lock it. Step labels show source slot:slice, reverse (R), and retrigger count (x).
+5. Click a step to mute it; Shift-click to lock it. Alt/Option-click to edit the source, slice, pitch, reverse, and retriggers. Step labels show source slot:slice, reverse (R), and retrigger count (x).
 6. Use **Lock rhythm / sources / pitch / glitches** to constrain Generate and Mutate. **Mutate** changes only some unlocked steps; **Chaos** controls density of transformations. **Undo** restores the last phrase edit (64 edits); **Swap A/B** exchanges two phrase snapshots. Both snapshots use the same sample bank and global controls.
 7. Choose straight, triplet, or dotted step lengths. This host-automatable control changes the length of all 16 steps. **Grain mode** repeats short windowed fragments within each slice.
 8. **Export WAV** saves a stereo 24-bit / 44.1 kHz phrase. **Drag WAV** renders the current phrase and starts an external file drag to an Ableton audio track. Rendering uses the last known host tempo (preview tempo after a stopped-host processing block).
@@ -35,7 +35,7 @@ cmake --build build --config Release --parallel 3
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-The macOS Actions workflow builds universal Intel/Apple Silicon AU, VST3, and standalone bundles, runs engine tests, ad-hoc signs the bundles, and packages a DMG. The workflow runs on PRs, main pushes, and manual dispatch.
+The macOS Actions workflow builds universal Intel/Apple Silicon AU, VST3, and standalone bundles, runs engine and JUCE state/export roundtrip tests, ad-hoc signs the bundles, and packages a DMG. The workflow runs on PRs, main pushes, and manual dispatch.
 
 Dependency-free engine tests can also be run on Linux:
 

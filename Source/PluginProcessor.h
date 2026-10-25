@@ -27,6 +27,7 @@ public:
     void undo();
     void swapAB();
     void toggleStep(int,bool lock);
+    void editStep(int,int action);
     void reslice();
     juce::String slotName(int) const;
     blucher::Pattern getPattern() const;
