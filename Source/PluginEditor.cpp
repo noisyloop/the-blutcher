@@ -53,7 +53,7 @@ void BlucherEditor::resized(){
     for(int i=0;i<4;++i){int x=24+(i%2)*484,y=526+(i/2)*64;labels[size_t(i)].setBounds(x,y,180,20);sliders[size_t(i)].setBounds(x,y+22,455,28);}
     generate.setBounds(24,650,118,36);mutate.setBounds(150,650,98,36);undo.setBounds(256,650,68,36);ab.setBounds(332,650,96,36);play.setBounds(436,650,96,36);slice.setBounds(540,650,96,36);save.setBounds(644,650,124,36);drag.setBounds(776,650,112,36);
     soundTab.setBounds(650,35,124,30);soundRandom.setBounds(580,240,290,30);
-    for(int i=0;i<5;++i){int column=i<3?0:1,row=i<3?i:i-3;int x=36+column*468,y=148+row*48;soundLabels[size_t(i)].setBounds(x,y-17,440,20);soundSliders[size_t(i)].setBounds(x,y,440,26);}
+    for(int i=0;i<5;++i){int column=i<3?0:1,row=i<3?i:i-3;int x=36+column*468,y=164+row*48;soundLabels[size_t(i)].setBounds(x,y-17,440,20);soundSliders[size_t(i)].setBounds(x,y,440,26);}
     for(int i=0;i<4;++i){choiceLabels[size_t(i)].setBounds(36+i*234,283,220,20);soundChoices[size_t(i)].setBounds(36+i*234,305,220,26);}
     division.setBounds(780,75,124,26);grains.setBounds(776,43,180,26);status.setBounds(24,688,950,20);
 }

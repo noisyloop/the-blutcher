@@ -29,6 +29,7 @@ int main(){
     CHECK(original.exportWav(directory.getChildFile("a.wav")));CHECK(restored.exportWav(directory.getChildFile("b.wav")));
     juce::MemoryBlock aFile,bFile;CHECK(directory.getChildFile("a.wav").loadFileAsData(aFile));CHECK(directory.getChildFile("b.wav").loadFileAsData(bFile));CHECK(aFile==bFile);
     std::unique_ptr<juce::AudioFormatReader> reader(wav.createReaderFor(directory.getChildFile("b.wav").createInputStream().release(),true));CHECK(reader!=nullptr);CHECK(reader->lengthInSamples==88200);reader.reset();
+    original.randomizeSound();original.undo();CHECK(original.parameters.getRawParameterValue("vocoder")->load()==.5f);CHECK(original.parameters.getRawParameterValue("formant")->load()==6.f);CHECK(original.parameters.getRawParameterValue("spectral")->load()==.25f);
     original.swapAB();restored.swapAB();CHECK(original.getPattern().seed==restored.getPattern().seed);CHECK(original.getPattern().notes[3].locked==restored.getPattern().notes[3].locked);
     juce::MemoryBlock again;restored.getStateInformation(again);CHECK(again.getSize()<state.getSize()+4096);
     CHECK(!restored.loadSample(0,source).isEmpty()); // Failed loads preserve the bank.

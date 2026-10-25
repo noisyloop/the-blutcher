@@ -56,7 +56,7 @@ void BlucherProcessor::processBlock(juce::AudioBuffer<float>& audio,juce::MidiBu
         }
         bool midiPlaying=std::any_of(held.begin(),held.end(),[](bool h){return h;});
         if(lock.isLocked()) {
-            // Feed silence while stopped so the STFT tail clears without stale audio.
+            // Restart the spectral buffers on the next activation to avoid stale audio.
             const bool active=hostPlaying || audition || midiPlaying;
             std::array<float,2> value{};
             if(active) { if(!rendererActive)renderer.prepare(rate);rendererActive=true;value=renderer.process(engine,beat,bpm,division,midiPlaying ? transpose : 0,grain,sound); }

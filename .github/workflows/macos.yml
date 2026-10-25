@@ -51,6 +51,12 @@ jobs:
             codesign --verify --deep --strict "dist/$bundle"
           done
           hdiutil create -volname 'The Blucher' -srcfolder dist -ov -format UDZO The-Blucher-macOS.dmg
+      - name: Preserve incremental build after test failures
+        if: always() && !cancelled() && steps.build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: build
+          key: blucher-macos15-xcode-v1-${{ hashFiles('CMakeLists.txt') }}-${{ github.sha }}
       - uses: actions/upload-artifact@v4
         with:
           name: The-Blucher-macOS

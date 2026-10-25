@@ -27,7 +27,7 @@ public:
             if(settings.carrier>0)carrier=engine.atBeat(beat,bpm,division,transpose,grain,settings.carrier-1);
             else {
                 const double step=std::floor(beat/Engine::stepBeats(division));const int index=int(std::fmod(std::fmod(step,16)+16,16));
-                const double frequency=110*std::pow(2.0,std::clamp(transpose+engine.pattern.notes[size_t(index)].semitones,-36,36)/12.0);
+                const double frequency=261.6255653006*std::pow(2.0,std::clamp(transpose+engine.pattern.notes[size_t(index)].semitones,-36,36)/12.0);
                 float value=0;for(int harmonic=1;harmonic<=24&&frequency*harmonic<rate*.45;++harmonic)value+=float(std::sin(2*pi*phase*harmonic)/harmonic)*.22f;
                 carrier={value,value};phase+=frequency/rate;phase-=std::floor(phase);
             }
