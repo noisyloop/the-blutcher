@@ -2,6 +2,27 @@
 
 Noisyloop's eight-slot sample slicing and glitch instrument, built with JUCE 8.0.10. The repository URL retains `the-blutcher`; the instrument is named **The Blucher**.
 
+![The Blucher sample bank view](docs/screenshots/ui-sample-bank.png)
+
+## Interface
+
+The window is split into four areas:
+
+- **Header**: the **Samples / Sound Lab** view switch, the **Step length** menu (straight, triplet, or dotted divisions), and the **Grain** playback toggle.
+- **Sample bank / Sound Lab**: the top panel shows eight slot cards, or the Sound Lab knobs and source menus. Each slot has its own colour, and the step grid reuses it, so you can see which sample a step plays at a glance.
+- **Phrase**: 16 steps in four beat groups. Each step shows its number, its `slot:slice`, a strip in the source slot's colour, **REV** when reversed, and `×n` for retriggers. Muted steps are hatched, locked steps show a padlock, and the playing step is highlighted. The **Locks** pills under the grid constrain Generate, Mutate, and Randomize Sound.
+- **Performance and Phrase actions**: knobs for Chaos, Slice sensitivity, Output, and Preview BPM, next to the Generate / Mutate / Preview, Undo / Swap A/B / Re-slice, and Export / Drag WAV buttons. Status messages and the current seed appear in the footer.
+
+![The Blucher Sound Lab view](docs/screenshots/ui-sound-lab.png)
+
+<details>
+<summary>Previous interface</summary>
+
+![Previous sample bank view](docs/screenshots/previous-ui-sample-bank.png)
+![Previous Sound Lab view](docs/screenshots/previous-ui-sound-lab.png)
+
+</details>
+
 ## Get started in Ableton
 
 Download **The-Blucher-macOS** from a successful [Actions build](../../actions), unzip it, and open the DMG. Quit Live and run `Install-The-Blucher.command`. The installer backs up existing bundles and installs the AU, VST3, and standalone app into your user account. These are ad-hoc signed development builds, not Apple-notarized distribution builds. Only run the installer for builds you trust.
@@ -10,10 +31,10 @@ Download **The-Blucher-macOS** from a successful [Actions build](../../actions),
 2. Click a sample slot or drop audio onto it. Dropping multiple files fills successive slots. Each slot accepts up to 30 seconds at 8–192 kHz; WAV, AIFF, and FLAC are recommended.
 3. Adjust **Slice sensitivity**, then press **Re-slice** to detect new transients. Sustained audio falls back to evenly spaced slices.
 4. Press **Generate**, then **Preview**, or start Live's transport. While the host plays, the phrase follows host tempo and song position. Preview uses its own BPM when stopped.
-5. Click a step to mute it; Shift-click to lock it. Alt/Option-click to edit the source, slice, pitch, reverse, and retriggers. Step labels show source slot:slice, reverse (R), and retrigger count (x).
-6. Use **Lock rhythm / sources / pitch / glitches** to constrain Generate and Mutate. **Mutate** changes only some unlocked steps; **Chaos** controls density of transformations. **Undo** restores the last phrase edit (64 edits); **Swap A/B** exchanges two phrase snapshots. Both snapshots use the same sample bank and global controls.
-7. Choose straight, triplet, or dotted step lengths. This host-automatable control changes the length of all 16 steps. **Grain mode** repeats short windowed fragments within each slice.
-8. Open **Sound Lab** to set a formant shift independently of playback pitch, layer up to four loaded slots, blend a second sample spectrum, and vocode a selected vocal slot using the internal harmonic synth or a selected sample carrier. **Vocal clarity** mixes the original vocal back into the vocoder for intelligibility. Layer voices follow the same step/slice/pitch/retrigger settings, selecting the next loaded slots after the main source. Spectral blending interpolates magnitudes while keeping the main signal phase.
+5. Click a step to mute it; Shift-click to lock it. Alt/Option-click to edit the source, slice, pitch, reverse, and retriggers. Steps show source `slot:slice`, reverse (**REV**), and retrigger count (`×n`).
+6. Use the **Rhythm / Sources / Pitch / Glitches** lock pills to constrain Generate and Mutate. **Mutate** changes only some unlocked steps; **Chaos** controls density of transformations. **Undo** restores the last phrase edit (64 edits); **Swap A/B** exchanges two phrase snapshots. Both snapshots use the same sample bank and global controls.
+7. Choose straight, triplet, or dotted divisions from **Step length** in the header. This host-automatable control changes the length of all 16 steps. **Grain** repeats short windowed fragments within each slice.
+8. Switch the view to **Sound Lab** to set a formant shift independently of playback pitch, layer up to four loaded slots, blend a second sample spectrum, and vocode a selected vocal slot using the internal harmonic synth or a selected sample carrier. **Vocal clarity** mixes the original vocal back into the vocoder for intelligibility. Layer voices follow the same step/slice/pitch/retrigger settings, selecting the next loaded slots after the main source. Spectral blending interpolates magnitudes while keeping the main signal phase.
 9. **Randomize Sound** varies Sound Lab controls using Chaos and the source/pitch/glitch locks. Undo restores the previous sound and phrase. A/B remains a pair of phrase snapshots sharing the sound controls.
 10. **Export WAV** saves a stereo 24-bit / 44.1 kHz phrase. **Drag WAV** renders the current phrase and starts an external file drag to an Ableton audio track. Rendering uses the last known host tempo (preview tempo after a stopped-host processing block).
 
