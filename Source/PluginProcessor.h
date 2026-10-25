@@ -1,6 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-#include "BlucherEngine.h"
+#include "VoiceRenderer.h"
 class BlucherProcessor : public juce::AudioProcessor {
 public:
     BlucherProcessor();
@@ -29,6 +29,7 @@ public:
     void toggleStep(int,bool lock);
     void editStep(int,int action);
     void reslice();
+    void randomizeSound();
     juce::String slotName(int) const;
     blucher::Pattern getPattern() const;
     juce::AudioProcessorValueTreeState parameters;
@@ -41,12 +42,16 @@ private:
     static juce::AudioProcessorValueTreeState::ParameterLayout layout();
     void checkpoint();
     blucher::Engine engine;
+    blucher::VoiceRenderer renderer;
+    blucher::SoundSettings soundSettings() const;
     std::array<juce::String,blucher::slots> names;
     std::vector<blucher::Pattern> history;
+    std::vector<blucher::SoundSettings> soundHistory;
+    void applySound(const blucher::SoundSettings&);
     blucher::Pattern alternate;
     double rate=44100, previewBeat=0;
     std::array<bool,128> held{};
     int transpose=0;
-    bool wasPreview=false;
+    bool wasPreview=false, rendererActive=false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlucherProcessor)
 };

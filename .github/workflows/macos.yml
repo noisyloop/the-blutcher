@@ -16,6 +16,9 @@ jobs:
       - name: Compile engine with sanitizers
         run: g++ -std=c++17 -Wall -Wextra -pedantic -fsanitize=address,undefined -g tests/EngineTests.cpp -ISource -o engine-tests
       - run: ./engine-tests
+      - name: Compile spectral tests with sanitizers
+        run: g++ -std=c++17 -O2 -Wall -Wextra -pedantic -fsanitize=address,undefined -g tests/SpectralTests.cpp -ISource -o spectral-tests
+      - run: ./spectral-tests
   build:
     runs-on: macos-15
     steps:

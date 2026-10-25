@@ -85,7 +85,7 @@ public:
         }
     }
     // No allocation, file IO, or random generation in sample playback.
-    std::array<float,2> atBeat(double beat, double bpm, int division, int transpose=0, bool grain=false) const {
+    std::array<float,2> atBeat(double beat, double bpm, int division, int transpose=0, bool grain=false, int slotOverride=-1) const {
         if (!std::isfinite(beat) || !std::isfinite(bpm) || bpm<=0) return {};
         const double duration = stepBeats(division);
         const double stepPosition = beat/duration;
@@ -93,7 +93,7 @@ public:
         const int index = int(std::fmod(std::fmod(stepFloor, steps)+steps, steps));
         const auto& s = pattern.notes[size_t(index)];
         if (!s.enabled || s.slot<0 || s.slot>=slots) return {};
-        const auto& sample = samples[size_t(s.slot)];
+        const auto& sample = samples[size_t(slotOverride>=0 ? std::clamp(slotOverride,0,slots-1) : s.slot)];
         if (!sample.loaded()) return {};
         const int cut = std::clamp(s.slice,0,int(sample.cuts.size())-2);
         const int begin=sample.cuts[size_t(cut)], end=sample.cuts[size_t(cut+1)];
