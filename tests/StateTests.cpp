@@ -14,12 +14,17 @@ int main(){
     std::unique_ptr<juce::AudioFormatWriter> writer(wav.createWriterFor(stream.get(),44100,2,24,{},0));CHECK(writer!=nullptr);stream.release();CHECK(writer->writeFromAudioSampleBuffer(sample,0,44100));writer.reset();
     BlucherProcessor original;CHECK(original.loadSample(0,source).isEmpty());CHECK(original.loadSample(1,source).isEmpty());original.generate(false);original.toggleStep(3,true);original.swapAB();original.generate(false);original.toggleStep(2,true);
     {const juce::ScopedLock l(original.mutex);original.locks.pitch=true;}
+    auto set=[&](const char* id,float value){auto* p=original.parameters.getParameter(id);p->setValueNotifyingHost(p->convertTo0to1(value));};
+    set("formant",6);set("vocoder",.5f);set("spectral",.25f);set("layers",1);set("layerMix",.5f);
+    CHECK(original.getLatencySamples()==1024);
     juce::MemoryBlock state;original.getStateInformation(state);CHECK(state.getSize()>44100*8);
+    auto saved=juce::ValueTree::readFromData(state.getData(),state.getSize());
+    for(int child=0;child<saved.getNumChildren();++child){auto t=saved.getChild(child);if(t.hasType("SAMPLE")){auto bytes=t["pcm"];CHECK(bytes.getBinaryData()!=nullptr);CHECK(bytes.getBinaryData()->getSize()==44100*8);}}
     CHECK(source.deleteFile()); // Session restore must not rely on original files.
     BlucherProcessor restored;restored.setStateInformation(state.getData(),int(state.getSize()));CHECK(restored.slotName(0)==original.slotName(0));CHECK(restored.getPattern().seed==original.getPattern().seed);CHECK(restored.getPattern().notes[2].locked);CHECK(restored.locks.pitch);
     original.prepareToPlay(44100,512);restored.prepareToPlay(44100,512);original.preview=true;restored.preview=true;
     double energy=0;
-    for(int block=0;block<32;++block){juce::AudioBuffer<float> a(2,512),b(2,512);juce::MidiBuffer ma,mb;original.processBlock(a,ma);restored.processBlock(b,mb);for(int ch=0;ch<2;++ch)for(int i=0;i<512;++i){CHECK(a.getSample(ch,i)==b.getSample(ch,i));energy+=std::abs(a.getSample(ch,i));}}
+    for(int block=0;block<32;++block){juce::AudioBuffer<float> a(2,512),b(2,512);juce::MidiBuffer ma,mb;original.processBlock(a,ma);restored.processBlock(b,mb);for(int ch=0;ch<2;++ch)for(int i=0;i<512;++i){if(a.getSample(ch,i)!=b.getSample(ch,i)){std::cerr<<"Playback mismatch block="<<block<<" frame="<<i<<" original="<<a.getSample(ch,i)<<" restored="<<b.getSample(ch,i)<<"\n";}CHECK(a.getSample(ch,i)==b.getSample(ch,i));energy+=std::abs(a.getSample(ch,i));}}
     CHECK(energy>1);
     CHECK(original.exportWav(directory.getChildFile("a.wav")));CHECK(restored.exportWav(directory.getChildFile("b.wav")));
     juce::MemoryBlock aFile,bFile;CHECK(directory.getChildFile("a.wav").loadFileAsData(aFile));CHECK(directory.getChildFile("b.wav").loadFileAsData(bFile));CHECK(aFile==bFile);

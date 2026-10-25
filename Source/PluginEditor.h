@@ -24,6 +24,7 @@ private:
     void chooseSample(int);
     void load(int,const juce::File&);
     void exportAudio(bool drag);
+    void showSound(bool);
     BlucherProcessor& processor;
     std::array<juce::TextButton,8> sampleButtons;
     std::array<BlucherStepButton,16> stepButtons;
@@ -32,6 +33,13 @@ private:
     std::array<juce::Label,4> labels;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> sliderAttachments;
     juce::TextButton generate{"GENERATE"},mutate{"MUTATE"},undo{"UNDO"},ab{"SWAP A/B"},play{"PREVIEW"},slice{"RE-SLICE"},save{"EXPORT WAV"},drag{"DRAG WAV"};
+    juce::TextButton soundTab{"SOUND LAB"}, soundRandom{"RANDOMIZE SOUND"};
+    bool soundVisible=false;
+    std::array<juce::Slider,5> soundSliders;
+    std::array<juce::Label,5> soundLabels;
+    std::array<juce::ComboBox,4> soundChoices;
+    std::array<juce::Label,4> choiceLabels;
+    std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>> soundChoiceAttachments;
     juce::ComboBox division;
     juce::ToggleButton grains{"Grain mode"};
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> divisionAttachment;
